@@ -2,6 +2,8 @@
 
 FlippyText is a Go library for printing animated text one character at a time.
 
+![Screencap](screencap.gif)
+
 ## Install
 
 ```
