@@ -13,11 +13,15 @@ const defaultTickerCount = 10
 const defaultRandomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
 type FlippyText struct {
-	TickerTime  time.Duration
+	// How long to pause between each characer flipping
+	TickerTime time.Duration
+	// How many times each character should flip through before resolving
 	TickerCount int
+	// The list of characters to use while flipping
 	RandomChars string
 }
 
+// Flip through the characters of word, printing to stdout
 func (t *FlippyText) Write(word string) error {
 	if word == "" {
 		return nil
@@ -40,6 +44,7 @@ func (t *FlippyText) Write(word string) error {
 	return nil
 }
 
+// Create a new FlippyText
 func New() *FlippyText {
 	return &FlippyText{
 		TickerTime:  defaultTickerTime,
