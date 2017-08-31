@@ -1,10 +1,20 @@
 package flippytext
 
 import (
+	"errors"
+	"io/ioutil"
+	"os"
 	"reflect"
 	"testing"
 	"time"
 )
+
+type invalidWriter struct {
+}
+
+func (i invalidWriter) Write(p []byte) (n int, err error) {
+	return 0, errors.New("invalid")
+}
 
 func TestNew(t *testing.T) {
 	ft := New()
@@ -12,6 +22,7 @@ func TestNew(t *testing.T) {
 		TickerTime:  defaultTickerTime,
 		TickerCount: defaultTickerCount,
 		RandomChars: defaultRandomChars,
+		Output:      os.Stdout,
 	}
 	if !reflect.DeepEqual(*ft, want) {
 		t.Errorf("New() == %+v wanted %+v", *ft, want)
@@ -35,6 +46,23 @@ func TestWrite(t *testing.T) {
 				TickerTime:  time.Second * 0,
 				TickerCount: defaultTickerCount,
 				RandomChars: defaultRandomChars,
+				Output:      os.Stdout,
+			}, "hello world", false,
+		},
+		{
+			&FlippyText{
+				TickerTime:  time.Second * 0,
+				TickerCount: defaultTickerCount,
+				RandomChars: defaultRandomChars,
+				Output:      os.Stderr,
+			}, "hello world", false,
+		},
+		{
+			&FlippyText{
+				TickerTime:  time.Second * 0,
+				TickerCount: defaultTickerCount,
+				RandomChars: defaultRandomChars,
+				Output:      ioutil.Discard,
 			}, "hello world", false,
 		},
 		{
@@ -42,6 +70,7 @@ func TestWrite(t *testing.T) {
 				TickerTime:  defaultTickerTime,
 				TickerCount: defaultTickerCount,
 				RandomChars: "",
+				Output:      os.Stdout,
 			}, "hello world", true,
 		},
 		{
@@ -49,7 +78,16 @@ func TestWrite(t *testing.T) {
 				TickerTime:  defaultTickerTime,
 				TickerCount: 0,
 				RandomChars: defaultRandomChars,
-			}, "hello world", false,
+				Output:      nil,
+			}, "hello world", true,
+		},
+		{
+			&FlippyText{
+				TickerTime:  time.Second * 0,
+				TickerCount: defaultTickerCount,
+				RandomChars: defaultRandomChars,
+				Output:      invalidWriter{},
+			}, "hello world", true,
 		},
 	}
 	for _, c := range cases {
